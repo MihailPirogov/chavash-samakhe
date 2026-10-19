@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Yandex Mobile Ads (Рекламная сеть Яндекса) — the ONLY place with ad unit IDs for «Чӑваш сӑмахӗ».
+     PLACEHOLDER: the Chuvash app is not created in partner.yandex.ru yet, so the "real" slots hold the Yandex demo units.
+     After creating the app (see release/STORE_STEPS.md, section Yandex Mobile Ads) replace the three ad_*_id values
+     with R-M-<appId>-1 / -2 / -3 and rebuild (tools/build_android.sh, bump versionCode).
+     Debug builds always use the demo units; release with demo units explicitly: gradle assembleRelease -PadsDemo=true -->
+<resources>
+    <!-- real units: TODO replace with R-M-XXXXXXXX-1 (banner), -2 (interstitial), -3 (rewarded «Подсказка» x1) -->
+    <string name="ad_banner_id" translatable="false">demo-banner-yandex</string>
+    <string name="ad_interstitial_id" translatable="false">demo-interstitial-yandex</string>
+    <string name="ad_rewarded_id" translatable="false">demo-rewarded-yandex</string>
+    <!-- Yandex demo units (always fill, no revenue) -->
+    <string name="ad_banner_demo_id" translatable="false">demo-banner-yandex</string>
+    <string name="ad_interstitial_demo_id" translatable="false">demo-interstitial-yandex</string>
+    <string name="ad_rewarded_demo_id" translatable="false">demo-rewarded-yandex</string>
+    <!-- Children: true = YandexAds.setAgeRestricted(true). General-audience word game (0+, not directed at children) -> false. -->
+    <bool name="ads_age_restricted">false</bool>
+</resources>
