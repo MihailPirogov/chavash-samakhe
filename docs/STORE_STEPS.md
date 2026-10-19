@@ -1,4 +1,4 @@
-# Чӑваш сӑмахӗ 1.0.0 — browser steps (RuStore, Google Play, Yandex Games, Yandex Mobile Ads)
+# Чӑваш сӑмахӗ 1.0.1 — browser steps (RuStore, Google Play, Yandex Games, Yandex Mobile Ads)
 
 Nothing here was submitted from the box. No payments are needed anywhere (all accounts already exist).
 Common values:
@@ -7,7 +7,7 @@ Common values:
 |---|---|
 | Name | **Чӑваш сӑмахӗ** (fallback if taken: «Чӑваш сӑмахӗ — чувашские слова») |
 | Package | `ru.pirogovlab.chavashsamakhe` |
-| Version | 1.0.0 (versionCode 1) |
+| Version | 1.0.1 (versionCode 2) — real Yandex Mobile Ads IDs, app 20244782 |
 | Developer | PirogovLab / Михаил Пирогов · site https://pirogovlab.ru · email mihail.pirogov@gmail.com |
 | Privacy policy | https://pirogovlab.ru/chavash-samakhe/privacy/ (ads edition, 19.10.2026, live) |
 | Texts | `release/store/TEXTS_ru.md` (short/full descriptions, keywords, what's new) |
@@ -15,11 +15,11 @@ Common values:
 | Age | 0+ (PEGI 3); Google Play target audience 13+ |
 | Signing cert SHA-256 | `78:46:54:96:23:2E:88:5D:61:8D:96:F5:AA:73:C6:8D:7B:1E:39:EC:CA:1D:05:C0:A1:A9:2D:27:92:E8:86:C5` |
 
-Recommended order: **§4 Yandex Mobile Ads app (test mode) → put real IDs in ads.xml, rebuild 1.0.1 (I can do it) → §1 RuStore / §2 Google Play → §4.3 store link in partner.yandex.ru**. You can also publish 1.0.0 as is (demo ad units: ads show, no revenue) and ship 1.0.1 with real IDs afterwards.
+Order: §4 Yandex Mobile Ads app — **done** (app 20244782, IDs in the 1.0.1 build) → §1 RuStore / §2 Google Play / §3 Yandex Games → §4.4 add the store link in partner.yandex.ru.
 
 ## 1. RuStore — https://console.rustore.ru
 1. Приложения → «Создать приложение» → тип **Игра**, имя **Чӑваш сӑмахӗ**, пакет `ru.pirogovlab.chavashsamakhe`.
-2. Upload APK: `release/chavash-samakhe-rustore.apk` (27.1 MB, signed with the new key).
+2. Upload APK: `release/chavash-samakhe-rustore.apk` (1.0.1, 27 137 233 bytes, SHA-256 91c5a19f…6b33f0bc, signed with the new key).
 3. Карточка:
    - Краткое описание: «Словесная головоломка на чувашском: буквы, кроссворды и перевод слов.»
    - Полное описание: «Полное описание» from TEXTS_ru.md · Что нового: «Первая версия.»
@@ -33,7 +33,7 @@ Recommended order: **§4 Yandex Mobile Ads app (test mode) → put real IDs in a
 
 ## 2. Google Play Console — https://play.google.com/console/u/0/developers/8084969663799476138/app-list
 1. «Создать приложение»: name **Чӑваш сӑмахӗ**, default language **Русский (ru-RU)**, **Игра**, **Бесплатное**; tick the declarations.
-2. Release → Testing → **Закрытое тестирование** (new personal account: 12+ testers for 14 days before production) → create release → enrol in **Play App Signing** (Google-generated key; our key = upload key) → upload `release/chavash-samakhe.aab` (26.9 MB). Release name `1.0.0 (1)`, notes «Первая версия.»
+2. Release → Testing → **Закрытое тестирование** (new personal account: 12+ testers for 14 days before production) → create release → enrol in **Play App Signing** (Google-generated key; our key = upload key) → upload `release/chavash-samakhe.aab` (1.0.1, SHA-256 d661fc36…8d8ee476). Release name `1.0.1 (2)`, notes «Первая версия.»
 3. Store listing (Основная страница):
    - Краткое описание (≤80): «Соединяйте буквы, собирайте чувашские слова. 700 уровней кроссвордов!»
    - Полное описание: from TEXTS_ru.md
@@ -60,17 +60,13 @@ Recommended order: **§4 Yandex Mobile Ads app (test mode) → put real IDs in a
 5. Countries: all (or Россия + СНГ). Then send the closed test for review; after 14 days with 12+ testers apply for production.
 
 ## 3. Yandex Games — https://games.yandex.ru/console
-Everything is in `release/YANDEX_CHECKLIST.md` (archive `release/chavash-samakhe-yandex.zip`, version 1.0.0, ru only, cloud saves ON, sticky banner via API ON, leaderboard `levels`, icon/cover/screenshots in `release/yandex_assets/`, privacy URL above). No video (optional).
+Everything is in `release/YANDEX_CHECKLIST.md` (archive `release/chavash-samakhe-yandex.zip`, version 1.0.1, ru only, cloud saves ON, sticky banner via API ON, leaderboard `levels`, icon/cover/screenshots in `release/yandex_assets/`, privacy URL above). No video (optional).
 
 ## 4. Yandex Mobile Ads (Рекламная сеть Яндекса) — https://partner.yandex.ru
-Same account as Мут тӱня (app 20239729) and Сүз дөньясы (app 20243911); `https://pirogovlab.ru/app-ads.txt` (`yandex.com, 1969132, DIRECT`) is account-wide and already live.
-1. **Реклама в приложениях → Приложения → «Добавить приложение» → «Моё приложение ещё не опубликовано»** → Платформа **Android**, название **Чӑваш сӑмахӗ** → «Добавить приложение». It gets an ID (8 digits, e.g. 2024xxxx) and status **Тестовый режим**.
-   (If RuStore/Play is already live: «Приложение опубликовано в другом магазине» → Магазин RuStore, Название «Чӑваш сӑмахӗ», Пакет `ru.pirogovlab.chavashsamakhe`, Ссылка на RuStore, Разработчик «PirogovLab» — or search Google Play by package.)
-2. Open the app → **«Добавить блок»**, three units, in this order so the numbers match:
-   1. **Баннер** — name «Чӑваш сӑмахӗ — sticky banner»; CPM strategy «Максимальный доход»; sizes: adaptive/sticky (the app uses `BannerAdSize.sticky`), video allowed. → `R-M-<ID>-1`
-   2. **Межстраничный (Interstitial)** — name «Чӑваш сӑмахӗ — interstitial»; «Максимальный доход». → `R-M-<ID>-2`
-   3. **С вознаграждением (Rewarded)** — name «Чӑваш сӑмахӗ — rewarded»; «Максимальный доход»; валюта **«Подсказка»**, сумма **1**. → `R-M-<ID>-3`
-3. Send me the app ID and the three `R-M-…` IDs. I put them into `android/app/src/main/res/values/ads.xml` (ad_banner_id / ad_interstitial_id / ad_rewarded_id), bump to versionCode 2 / 1.0.1, rebuild APK/AAB and re-upload the site APK. No other code changes.
+Same account as Мут тӱня (20239729) and Сүз дөньясы (20243911); `https://pirogovlab.ru/app-ads.txt` (`yandex.com, 1969132, DIRECT`) is account-wide and live.
+1. **Done:** app **20244782** «Чӑваш сӑмахӗ», Android, status Тестовый режим.
+2. **Done:** units — banner **R-M-20244782-1**, interstitial **R-M-20244782-2**, rewarded **R-M-20244782-3** (валюта «Подсказка», 1).
+3. **Done:** IDs in `android/app/src/main/res/values/ads.xml`, build 1.0.1 (versionCode 2); site APK updated.
 4. After RuStore/Play publication: partner.yandex.ru → app → add the **store link** (RuStore and/or Google Play) → moderation up to ~2 days → status **Активно**. Access is confirmed via app-ads.txt: keep **https://pirogovlab.ru** as the developer website in the store listing (Yandex crawls it about once a day). Check Настройки → Общие → app-ads.txt still shows 1969132.
 5. Age: the app sends `setAgeRestricted(false)` (0+, general audience). If you ever mark the app for children under 13, set `ads_age_restricted=true` in ads.xml.
 

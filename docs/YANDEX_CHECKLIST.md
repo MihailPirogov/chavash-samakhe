@@ -2,7 +2,7 @@
 
 Archive: `release/chavash-samakhe-yandex.zip`: index.html in the root, 140 files, 19.8 MB zipped / 20.5 MB unpacked (limit 100 MB).
 Rebuild with `python3 tools/build_release.py yandex` (adds `/sdk.js`, the Yandex adapter and `window.RELEASE`; strips test hooks, badge, noindex and every external link/domain; no Mobile Ads, only Yandex Games SDK ads).
-Test: `cd test && node test_release.js` (mock SDK): ALL PASS (19.10.2026).
+Test: `cd test && node test_release.js` (mock SDK): ALL PASS (19.10.2026, 1.0.1). SHA-256 `c0ab77daa02625d886dfa60328ab40954a0cc4d73281c4bddad6b5be528f7474`.
 
 Console: https://games.yandex.ru/console → «Добавить приложение».
 
@@ -11,7 +11,7 @@ Console: https://games.yandex.ru/console → «Добавить приложен
 |---|---|
 | Языки | Only Russian (ru). UI Russian; game words Chuvash with Russian clues. |
 | Архив | `chavash-samakhe-yandex.zip` |
-| Версия | 1.0.0 |
+| Версия | 1.0.1 |
 | Категории | Головоломки / Словесные (optionally Образовательные) |
 | Платформы | Мобильные + Десктоп |
 | Ориентация (mobile) | Портретная |

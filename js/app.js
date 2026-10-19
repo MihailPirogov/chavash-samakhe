@@ -399,7 +399,7 @@
   $('sheet').addEventListener('click', e => { const li = e.target.closest('[data-w]'); if (li && li.dataset.w) openCard(li.dataset.w, glossOf(li.dataset.w)); });
 
   /* ================= CREDITS ================= */
-  const GAME_VERSION = '0.1.0';
+  const GAME_VERSION = '1.0.1';
   function creditsHtml() {
     const ver = GAME_VERSION + (window.BUILD_V ? ' (' + window.BUILD_V + ')' : '') + (document.getElementById('testBadge') ? ' · ' + T('crTest') : '');
     return `<div class="about credits">
