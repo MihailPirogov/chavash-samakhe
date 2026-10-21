@@ -359,3 +359,6 @@ html,body{background:#1e0b0d}
 .playbtn{background-image:var(--band),linear-gradient(180deg,#e04050,var(--red) 50%,var(--red2));background-size:45px 14px,auto;background-repeat:repeat-x,no-repeat;background-position:center calc(100% - 7px),0 0}
 .brand:before,.brand:after{content:"";display:inline-block;width:12px;height:12px;background:var(--rh) center/contain no-repeat;vertical-align:-2px;margin:0 6px}
 .playbtn,#scrHome .playbtn{padding-bottom:26px}
+/* РСЯ web banner (plain web only, js/adapters/web.js): fixed bottom strip; #app shrinks so it never covers the game */
+#webAdBanner{position:fixed;left:0;right:0;bottom:0;height:50px;max-height:50px;overflow:hidden;z-index:30;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,.04)}
+#webAdBanner[hidden]{display:none}
