@@ -260,7 +260,7 @@ body.spinning .spinDisk .bulb.b1,body.spinning .spinDisk .bulb.b2{animation-dura
 .adSim small{display:block;font-weight:600;opacity:.7;margin-top:6px}
 .adSim button{position:absolute;right:6px;top:4px;font-size:18px;color:#555}
 #adSimBanner{position:fixed;left:0;right:0;bottom:0;height:50px;z-index:30;background:repeating-linear-gradient(45deg,#ececec 0 12px,#dcdcdc 12px 24px);color:#555;font:700 13px/50px system-ui,sans-serif;text-align:center}
-html.withBanner #app{height:calc(100% - 50px)}
+html.withBanner #app{height:calc(100% - var(--ad-h,50px) - env(safe-area-inset-bottom))}
 /* ---- phone landscape (low height): two columns so nothing overlaps or falls off-screen */
 @media (orientation:landscape) and (max-height:540px){
   #app{max-width:940px}
@@ -360,5 +360,13 @@ html,body{background:#1e0b0d}
 .brand:before,.brand:after{content:"";display:inline-block;width:12px;height:12px;background:var(--rh) center/contain no-repeat;vertical-align:-2px;margin:0 6px}
 .playbtn,#scrHome .playbtn{padding-bottom:26px}
 /* РСЯ web banner (plain web only, js/adapters/web.js): fixed bottom strip; #app shrinks so it never covers the game */
-#webAdBanner{position:fixed;left:0;right:0;bottom:0;height:50px;max-height:50px;overflow:hidden;z-index:30;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,.04)}
+#webAdBanner{position:fixed;left:0;right:0;bottom:0;height:var(--ad-h,50px);max-height:var(--ad-h,50px);margin-bottom:env(safe-area-inset-bottom);overflow:hidden;z-index:30;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,.04)}
 #webAdBanner[hidden]{display:none}
+
+/* ---- fit-to-height (1.0.2): banner reserve never squeezes the preview/wheel; only the crossword area flexes ---- */
+#scrGame>.topbar,#scrGame>.prog,#preview,#bottom{flex-shrink:0}
+#gridWrap{flex:1 1 0;overflow:hidden;position:relative;z-index:1}
+#preview{position:relative;z-index:3}
+#grid.compact{padding:16px 8px;background-size:36px 11px,36px 11px,auto;background-position:center 3px,center calc(100% - 3px),0 0}
+@media (max-height:600px) and (orientation:portrait){#preview{height:40px}#preview span{font-size:24px;padding:2px 14px}}
+#grid.compact.tight{gap:2px;padding:12px 6px}

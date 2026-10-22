@@ -186,7 +186,7 @@
     if (kind === 'daily') { $('gTitle').textContent = T('daily'); $('gSub').textContent = dayKey(); }
     else { const ch = chapterOf(id); $('gTitle').textContent = T('level') + ' ' + (id + 1); $('gSub').textContent = chapName(ch) + ' · ' + (id + 2 - ch.start) + '/' + (ch.end - ch.start + 1); }
     show('game');
-    requestAnimationFrame(() => { buildGrid(); buildWheel(true); updProg(); updJar(); updHintBtns(); });
+    requestAnimationFrame(() => { buildWheel(true); buildGrid(); updProg(); updJar(); updHintBtns(); });
     // preload cards for this level
     new Set(game.lv.w.map(x => x[0].codePointAt(0))).forEach(k => loadChunk(String.fromCodePoint(k)));
   }
@@ -194,8 +194,15 @@
 
   function buildGrid() {
     const g = $('grid'), lv = game.lv; g.innerHTML = ''; game.cells = {};
-    const wr = $('gridWrap').getBoundingClientRect();
-    const size = Math.max(22, Math.min(56, Math.floor(Math.min((wr.width - 36) / lv.c, (wr.height - 64) / lv.r) - 4)));
+    // fit the crossword panel into #gridWrap: real paddings + gaps (was a fixed "-64" guess -> overflow over the preview when a banner shrinks the screen)
+    const wrap = $('gridWrap'), wr = wrap.getBoundingClientRect(), px = v => parseFloat(v) || 0;
+    const fit = () => { const gs = getComputedStyle(g), ws = getComputedStyle(wrap), gap = px(gs.rowGap) || 4;
+      const aw = wr.width - px(gs.paddingLeft) - px(gs.paddingRight) - 8, ah = wr.height - px(ws.paddingTop) - px(ws.paddingBottom) - px(gs.paddingTop) - px(gs.paddingBottom);
+      return Math.floor(Math.min((aw - gap * (lv.c - 1)) / lv.c, (ah - gap * (lv.r - 1)) / lv.r, 56)); };
+    g.classList.remove('compact', 'tight'); let size = fit();
+    if (size < 30) { g.classList.add('compact'); size = fit(); }
+    if (size < 13) { g.classList.add('tight'); size = fit(); }   // low screens: slimmer embroidered frame
+    size = Math.max(12, size);
     g.style.gridTemplateColumns = `repeat(${lv.c}, ${size}px)`; g.style.gridTemplateRows = `repeat(${lv.r}, ${size}px)`;
     for (let r = 0; r < lv.r; r++) for (let c = 0; c < lv.c; c++) { const d = document.createElement('div'); d.className = 'cell'; d.style.fontSize = (size * .6) + 'px'; g.appendChild(d); game.cells[r + ',' + c] = { el: d, ch: null }; }
     lv.w.forEach(w => cellsOf(w).forEach(([r, c], i) => { const m = game.cells[r + ',' + c]; m.ch = w[0][i]; m.el.classList.add('on'); }));
@@ -232,7 +239,8 @@
   function buildWheel(anim) {
     const wh = $('wheel'); wh.querySelectorAll('.let').forEach(e => e.remove());
     const lowLand = innerWidth > innerHeight && innerHeight <= 540;  // phone landscape: wheel sits in the right column
-    const D = lowLand ? Math.max(150, Math.min(innerHeight - 180, 250)) : Math.max(170, Math.min(innerWidth - 150, innerHeight * .34, 290)); wh.style.width = wh.style.height = D + 'px'; game.R = D / 2;
+    const AH = $('app').clientHeight || innerHeight;  // #app height = screen minus any banner reserve
+    const D = lowLand ? Math.max(150, Math.min(AH - 180, 250)) : Math.max(AH < 600 ? 140 : 160, Math.min(innerWidth - 150, AH * .32, 290)); wh.style.width = wh.style.height = D + 'px'; game.R = D / 2;
     $('lines').setAttribute('viewBox', `0 0 ${D} ${D}`);
     const n = game.letters.length; game.letterEls = [];
     const rad = n <= 3 ? .5 : n <= 5 ? .58 : .62;
@@ -963,7 +971,10 @@
   window.addEventListener('resize', () => { tutKey = ''; tutFingerKey = ''; });
 
   /* ================= INIT ================= */
-  window.addEventListener('resize', () => { if (screen === 'game' && game.lv) { buildGrid(); buildWheel(false); } });
+  const relayout = () => { if (screen === 'game' && game.lv) { buildWheel(false); buildGrid(); } };
+  window.addEventListener('resize', relayout);
+  // banner shown/hidden (web class / Android WebView resize) changes the game area without always firing resize: refit on size change
+  if (window.ResizeObserver) { let rlH = 0, rlW = 0, rlRaf = 0; new ResizeObserver(es => { const c = es[0].contentRect; if (Math.abs(c.height - rlH) < 1 && Math.abs(c.width - rlW) < 1) return; rlH = c.height; rlW = c.width; cancelAnimationFrame(rlRaf); rlRaf = requestAnimationFrame(relayout); }).observe($('app')); }
   Platform.onPause(() => save());
   document.querySelector('.logo-orn').style.backgroundImage = Art.ornament('#e9b949', '#b8202f', 18);
   // Chuvash folk UI decoration: embroidered rhombus bands, panel corners, red/black embroidered wheel ring (all generated SVG, js/art.js)
