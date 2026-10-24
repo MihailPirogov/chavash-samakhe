@@ -13,8 +13,8 @@ android {
         applicationId 'ru.pirogovlab.chavashsamakhe'
         minSdk 24
         targetSdk 36
-        versionCode 3
-        versionName '1.0.2'
+        versionCode 4
+        versionName '1.0.3'
     }
     buildFeatures { buildConfig true }
     signingConfigs {
@@ -30,7 +30,9 @@ android {
     buildTypes {
         // ad unit IDs: res/values/ads.xml. ads_demo=true -> Yandex demo units (debug builds, or -PadsDemo=true)
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             resValue 'bool', 'ads_demo', (project.findProperty('adsDemo') ?: 'false').toString()
         }
@@ -45,4 +47,6 @@ android {
 dependencies {
     // Yandex Mobile Ads SDK (banner / interstitial / rewarded). Ad unit IDs: res/values/ads.xml
     implementation 'com.yandex.android:mobileads:8.6.0'
+    // explicit: Play Console asked to update transitive androidx.fragment
+    implementation 'androidx.fragment:fragment:1.9.1'
 }

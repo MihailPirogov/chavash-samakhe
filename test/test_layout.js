@@ -2,7 +2,7 @@
 const { chromium } = require('playwright-core'); const path = require('path'), fs = require('fs');
 const ROOT = path.resolve(__dirname, '..'), OUT = process.env.OUT || path.join(ROOT, 'shots', 'layout'); fs.mkdirSync(OUT, { recursive: true });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const sizes = [[320,568],[360,640],[360,780],[393,852],[412,915],[412,738],[768,1024],[800,1280]];
+const sizes = process.env.SIZES ? JSON.parse(process.env.SIZES) : [[320,568],[360,640],[360,780],[393,852],[412,915],[412,738],[768,1024],[800,1280],[1280,800],[2560,1600],[915,412],[1024,768]];
 const banners = [0,50,60,90];
 let fails = 0;
 (async () => {

@@ -3,11 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 tools/build_release.py android
-export ANDROID_HOME=/opt/android-sdk
-(cd android && /opt/gradle-8.13/bin/gradle --no-daemon -q clean assembleRelease bundleRelease)
+export ANDROID_HOME=${ANDROID_HOME:-$( [ -d /opt/android-sdk ] && echo /opt/android-sdk || echo /home/box/android-sdk )}
+GRADLE=$( [ -x /opt/gradle-8.13/bin/gradle ] && echo /opt/gradle-8.13/bin/gradle || echo /home/box/gradle-8.13/bin/gradle )
+[ -n "${JAVA_HOME:-}" ] || { [ -d /home/box/jdk17 ] && export JAVA_HOME=/home/box/jdk17 && export PATH=$JAVA_HOME/bin:$PATH; }
+(cd android && $GRADLE --no-daemon -q clean assembleRelease bundleRelease)
 cp android/app/build/outputs/apk/release/app-release.apk release/chavash-samakhe.apk
 cp android/app/build/outputs/bundle/release/app-release.aab release/chavash-samakhe.aab
-BT=/opt/android-sdk/build-tools/36.0.0
+BT=$ANDROID_HOME/build-tools/36.0.0
 $BT/apksigner verify release/chavash-samakhe.apk && echo "apk signature OK"
 $BT/aapt2 dump badging release/chavash-samakhe.apk | grep -E "^package|minSdk|targetSdk|application-label:"
 $BT/aapt2 dump permissions release/chavash-samakhe.apk | grep -o "name='[^']*'" | tr '\n' ' '; echo

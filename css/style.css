@@ -279,7 +279,7 @@ html.withBanner #app{height:calc(100% - var(--ad-h,50px) - env(safe-area-inset-b
   #scrGame .topbar{grid-area:top}
   #scrGame .prog{grid-area:prog}
   #gridWrap{grid-area:grid;padding:6px 0}
-  #preview{grid-area:preview;align-self:end;height:42px}
+  #preview{grid-area:preview;align-self:end;height:42px;margin-bottom:6px}
   #bottom{grid-area:bottom;padding-bottom:2px}
   .side{bottom:4px;gap:8px}
   .gbtn{width:50px;height:50px}
