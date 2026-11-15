@@ -267,20 +267,45 @@
   const curWord = () => game.sel.map(i => game.letters[i]).join('');
   function updSel() { game.letterEls.forEach((e, i) => e.classList.toggle('sel', game.sel.includes(i))); const w = $('word'); w.className = ''; w.textContent = curWord(); }
   const wheel = $('wheel');
-  wheel.addEventListener('pointerdown', e => { Sound.unlock(); const i = hit(e.clientX, e.clientY); if (i < 0) return; game.dragging = true; game.sel = [i]; updSel(); Sound.tap(0); haptic(5); drawLines(e.clientX, e.clientY); try { wheel.setPointerCapture(e.pointerId); } catch (_) {} e.preventDefault(); });
+  wheel.addEventListener('pointerdown', e => { Sound.unlock(); const i = hit(e.clientX, e.clientY); if (i < 0) return; game.dragging = true; game.sel = [i]; game.hov = i; game.hovDone = true; updSel(); Sound.tap(0); haptic(5); drawLines(e.clientX, e.clientY); try { wheel.setPointerCapture(e.pointerId); } catch (_) {} e.preventDefault(); });
   // Words are matched by their letter STRING (submit), so any copy of a duplicated letter is valid. Backtracking (un-selecting the last letter)
   // needs the pointer well inside the previous letter, so a swipe that merely passes near an already used copy on its way to the other copy does not undo.
+  // Duplicated letters are interchangeable: touching an already used tile whose letter has a FREE twin selects that twin
+  // (the player meant "this letter", not "this tile"), once per hover; without a free twin the old backtrack rule applies.
+  const addSel = i => { game.sel.push(i); updSel(); Sound.tap(game.sel.length - 1); haptic(5); };
   wheel.addEventListener('pointermove', e => { if (!game.dragging) return; const [i, d] = hitD(e.clientX, e.clientY);
-    if (i >= 0) { if (!game.sel.includes(i)) { game.sel.push(i); updSel(); Sound.tap(game.sel.length - 1); haptic(5); } else if (game.sel.length > 1 && game.sel[game.sel.length - 2] === i && d < .55) { game.sel.pop(); updSel(); } }
+    if (i !== game.hov) { game.hov = i; game.hovDone = false; }
+    if (i >= 0) { const n = game.sel.length;
+      if (!game.sel.includes(i)) { addSel(i); game.hovDone = true; }
+      else if (i !== game.sel[n - 1]) { const prev = n > 1 && game.sel[n - 2] === i;
+        const twin = game.letters.findIndex((c, k) => c === game.letters[i] && !game.sel.includes(k));
+        if (twin >= 0) { if (!game.hovDone && (!prev || d < .55)) { addSel(twin); game.hovDone = true; } }
+        else if (prev && d < .55) { game.sel.pop(); updSel(); } } }
     drawLines(e.clientX, e.clientY); });
   const endDrag = () => { if (!game.dragging) return; game.dragging = false; const w = curWord(), idx = game.sel.slice(); game.sel = []; drawLines(); game.letterEls.forEach(e => e.classList.remove('sel')); if (w.length) submit(w, idx); };
   wheel.addEventListener('pointerup', endDrag); wheel.addEventListener('pointercancel', endDrag);
 
   function clearPreview(ms) { setTimeout(() => { if (!game.dragging) { const s = $('word'); s.textContent = ''; s.className = ''; } }, ms || 650); }
   function learn(w, g0) { if (!st.learned[w]) { const g = g0 || glossOf(w); st.learned[w] = { d: dayNum(), g: g ? g[0].slice(0, 60) : '', s: g ? g[1] : '' }; } }
+  // Word check is by the composed STRING (NFC), never by tile ids, so any copy of a duplicated letter counts.
+  // A swipe to the far copy of a letter often grazes the near copy first ("саан" for "сан"): if the raw string is not a word,
+  // drop one letter of a doubled pair (two different tiles with the same letter) when that gives a level/bonus word.
+  const nfc = s => String(s).normalize('NFC');
+  const isWord = (lv, s) => lv.w.some(x => nfc(x[0]) === s) || (s.length >= 3 && lv.b.some(b => nfc(b) === s));
+  function resolveWord(lv, w, idx) {
+    w = nfc(w); if (isWord(lv, w)) return [w, idx];
+    const L = Array.from(w);
+    for (let k = 0; k < L.length - 1; k++) if (L[k] === L[k + 1]) {
+      const s = L.slice(0, k).concat(L.slice(k + 1)).join('');
+      if (isWord(lv, s)) return [s, idx && idx.length === L.length ? idx.slice(0, k).concat(idx.slice(k + 1)) : null];
+    }
+    return [w, idx];
+  }
   function submit(w, idx) {
-    const span = $('word'); span.textContent = w; const lv = game.lv;
-    const target = lv.w.find(x => x[0] === w);
+    const lv = game.lv; [w, idx] = resolveWord(lv, w, idx);
+    const span = $('word'); span.textContent = w;
+    const target = lv.w.find(x => nfc(x[0]) === w);
+    if (target) w = target[0];
     if (target) {
       if (game.found.has(w)) { span.className = 'dup'; Sound.dup(); flashWord(target); toast(w, T('already')); return clearPreview(); }
       span.className = 'good'; game.found.add(w); learn(w); st.stats.words++; quest('words', 1);
@@ -291,7 +316,8 @@
       if (lv.w.every(x => game.found.has(x[0]))) setTimeout(win, 1000);
       checkAch(); return;
     }
-    if (w.length >= 3 && lv.b.includes(w)) {
+    const bw = w.length >= 3 && lv.b.find(b => nfc(b) === w);
+    if (bw) { w = bw;
       if (game.bonus.has(w)) { span.className = 'dup'; Sound.dup(); toast(w, T('already')); return clearPreview(); }
       game.bonus.add(w); learn(w); st.stats.bonus++; st.jar++; quest('bonus', 1); Sound.bonus(); haptic(10);
       span.className = 'good'; persist(); updJar(true); toast('+ ' + w, T('bonusWord') + ' · ' + glossHtml(w), w); clearPreview(); checkAch(); return;
